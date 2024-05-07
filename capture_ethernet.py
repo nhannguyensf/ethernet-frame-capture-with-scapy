@@ -1,38 +1,46 @@
-# Import the sniff function from Scapy library.
 from scapy.all import *
 
 def capture_ethernet_frames(count=15):
     """
-    Capture a specified number of Ethernet frames using the Scapy library.
+    Function to capture a specified number of Ethernet frames and analyze each frame for networking details.
 
     Args:
     - count (int): Number of Ethernet frames to capture, default is 15.
 
     Returns:
-    - list: A list of captured packets, each item is a Scapy packet object.
+    - list: A list of captured packets, each item being a Scapy packet object with detailed network information extracted.
 
-    This function utilizes the sniff() function from Scapy to capture packets.
-    It filters for Ethernet frames only ('ether' filter) and limits the capture
-    to 'count' number of frames. Each captured frame is printed with a summary
-    for quick inspection.
+    This function uses Scapy's sniff() to capture packets and then analyzes each packet to extract MAC and IP details.
+    It prints a summary along with the source and destination MAC addresses, and if available, IP version, source IP, and
+    destination IP addresses.
     """
-    print("Starting packet capture") # Debug purpose
+    
+    print("Starting packet capture")  # Notify user that packet capture is starting
 
-    # Sniff 'count' Ethernet frames. The filter 'ether' ensures only Ethernet frames are captured.
+    # Capture 'count' Ethernet frames using Scapy's sniff function. The capture can be filtered using 'filter' parameter if necessary.
     packets = sniff(count=count)
+    print("Packet capture done")  # Notify user that packet capture has finished
 
-    print("Packet capture done") # Debug purpose
-
-    # Print a summary of each captured packet.
+    # Process each packet to extract and print details
     for packet in packets:
-        print(packet.summary())
+        print("\n--- Packet Summary ---")
+        print(packet.summary())  # Print a brief summary of each packet
 
-    # Return the list of captured packets for further processing if needed.
+        # Extract and display the source and destination MAC addresses from the Ethernet layer of the packet
+        if packet.haslayer(Ether):
+            src_mac = packet[Ether].src  # Source MAC address
+            dst_mac = packet[Ether].dst  # Destination MAC address
+            print(f"Source MAC: {src_mac}, Destination MAC: {dst_mac}")
+
+        # Check if the packet contains an IP layer and extract details if present
+        if packet.haslayer(IP):
+            ip_layer = packet[IP]  # Access the IP layer of the packet
+            print(f"IP Version: {ip_layer.version}")  # Print the IP version (IPv4 or IPv6)
+            print(f"Source IP: {ip_layer.src}, Destination IP: {ip_layer.dst}")  # Print source and destination IP addresses
+
+    # Return the list of captured packets for possible further processing
     return packets
 
-
-# The following code will only execute if this script is run directly (not imported as a module).
+# Ensures that the capture function is only executed when the script is run directly
 if __name__ == "__main__":
-    # Call the capture function and store the returned list of packets
-    captured_frames = capture_ethernet_frames(15)
-
+    captured_frames = capture_ethernet_frames(15)  # Capture and analyze 15 Ethernet frames
