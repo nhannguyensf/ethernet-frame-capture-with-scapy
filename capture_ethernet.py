@@ -22,8 +22,9 @@ def capture_ethernet_frames(count=15):
     print("Packet capture done")  # Notify user that packet capture has finished
 
     # Process each packet to extract and print details
+    i = 0
     for packet in packets:
-        print("\n--- Packet Summary ---")
+        print(f"\n--- Packet Summary {i+1}: ---")
         print(packet.summary())  # Print a brief summary of each packet
 
         # Extract and display the source and destination MAC addresses from the Ethernet layer of the packet
@@ -37,7 +38,8 @@ def capture_ethernet_frames(count=15):
             ip_layer = packet[IP]  # Access the IP layer of the packet
             print(f"IP Version: {ip_layer.version}")  # Print the IP version (IPv4 or IPv6)
             print(f"Source IP: {ip_layer.src}, Destination IP: {ip_layer.dst}")  # Print source and destination IP addresses
-
+        i+=1
+    print("\n------- Packet analyzing finished! -------\n")  # Notify user that packet analyzing has finished
     # Return the list of captured packets for possible further processing
     return packets
 
